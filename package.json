@@ -15,7 +15,8 @@
     "preview": "vite preview",
     "prepare": "npm run build",
     "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "repomix": "npx repomix --include \"src\""
   },
   "dependencies": {
     "react": "^19.1.0",

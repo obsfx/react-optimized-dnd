@@ -209,3 +209,5 @@ export default function Column({
   );
 }
 ```
+## Structured AI-friendly source code
+You can find the structured source code [repomix-output.xml](mdc:repomix-output.xml) file.
