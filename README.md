@@ -192,10 +192,6 @@ Hook to make an element a drop target.
 - `data`: Any object to identify the droppable (required)
 - Returns: `{ droppableRef, isOver }`
 
-### Types
-
-All type definitions are exported from `src/types.ts`.
-
 ## License
 
 MIT
