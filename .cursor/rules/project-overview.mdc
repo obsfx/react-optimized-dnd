@@ -1,0 +1,211 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project overview
+- This is a react project that provides drag and drop components and hooks and it is published as an npm package.
+- All the type definitions defined at the [types.ts](mdc:src/types.ts) file. Use this [types.ts](mdc:src/types.ts) file to figure out the API of the package and the props of the components or hooks.
+- This packages provides [ReactOptimizedDndContext.tsx](mdc:src/ReactOptimizedDndContext.tsx) component that should wrap the component that we want to have drag and drop functionality.
+- This package provides [useDraggable.ts](mdc:src/useDraggable.ts) hook to make the desired component draggable.
+- This package provides [useDroppable.ts](mdc:src/useDroppable.ts) hook to make the desired component droppable for the draggable component.
+
+## Example usage
+Here is an example usage that demonstrate the component and hooks API. It is a simple trello like 3 column drag and drop example.
+
+### Container.tsx
+```tsx
+import Card from "@/components/Card";
+import Column from "@/components/Column";
+import { useState } from "react";
+import { ReactOptimizedDndProvider } from "react-optimized-dnd";
+import { columnsData } from "@/lib/data";
+
+export default function Example() {
+  const [columns, setColumns] = useState(columnsData);
+
+  return (
+    <div className="flex gap-2">
+      <ReactOptimizedDndProvider
+        onDragStart={() => {
+          console.log("drag start");
+        }}
+        onDragEnd={(state) => {
+          const draggingElementData = state.draggingElement.data;
+          const overElementData = state.overElement.data;
+          if (!draggingElementData || !overElementData) return;
+
+          if (overElementData.type === "card") {
+            const newColumns = [...columns];
+
+            const targetColumnIndex = overElementData.columnIndex;
+            const targetCardIndex = overElementData.index;
+
+            const draggingElementColumnIndex = draggingElementData.columnIndex;
+            const draggingElementIndex = draggingElementData.index;
+            const draggingItem =
+              newColumns[draggingElementColumnIndex][draggingElementIndex];
+
+            newColumns[draggingElementColumnIndex] = newColumns[
+              draggingElementColumnIndex
+            ].filter((_, index) => index !== draggingElementIndex);
+
+            newColumns[targetColumnIndex].splice(
+              targetCardIndex,
+              0,
+              draggingItem
+            );
+
+            setColumns(newColumns);
+            console.log("drag end");
+            return;
+          }
+
+          if (overElementData.type === "column") {
+            const newColumns = [...columns];
+
+            const targetColumnIndex = overElementData.index;
+
+            const draggingElementColumnIndex = draggingElementData.columnIndex;
+            const draggingElementIndex = draggingElementData.index;
+            const draggingItem =
+              newColumns[draggingElementColumnIndex][draggingElementIndex];
+
+            newColumns[draggingElementColumnIndex] = newColumns[
+              draggingElementColumnIndex
+            ].filter((_, index) => index !== draggingElementIndex);
+
+            newColumns[targetColumnIndex] = [
+              ...newColumns[targetColumnIndex],
+              draggingItem,
+            ];
+
+            setColumns(newColumns);
+            console.log("drag end");
+            return;
+          }
+        }}
+        onDragOver={() => {
+          console.log("drag over");
+        }}
+      >
+        {columns.map((column, columnIndex) => (
+          <Column key={columnIndex} index={columnIndex}>
+            {column.map((item, cardIndex) => {
+              console.log("item", item);
+              return (
+                <Card
+                  key={cardIndex}
+                  index={cardIndex}
+                  columnIndex={columnIndex}
+                  title={item.title}
+                  description={item.description}
+                  color={item.color}
+                />
+              );
+            })}
+          </Column>
+        ))}
+      </ReactOptimizedDndProvider>
+    </div>
+  );
+}
+```
+
+### Card.tsx
+
+```tsx
+import { cn } from "@/lib/utils";
+import { useMemo, useRef } from "react";
+import { useDraggable, useDroppable } from "react-optimized-dnd";
+
+export default function Card({
+  index,
+  columnIndex,
+  title,
+  description,
+  color,
+}: {
+  index: number;
+  columnIndex: number;
+  title: string;
+  description: string;
+  color: string;
+}) {
+  const { droppableRef, isOver } = useDroppable({
+    data: { index, columnIndex, type: "card" },
+  });
+  const { handleRef, deltaPos, isDragging } = useDraggable({
+    data: { index, columnIndex, type: "card" },
+  });
+
+  return (
+    <div
+      ref={droppableRef}
+      className={cn("select-none", {
+        "border border-transparent": !isDragging,
+        "border border-stone-200 bg-stone-50 rounded-md": isDragging,
+      })}
+    >
+      <div
+        ref={handleRef}
+        className={cn("w-full relative rounded-md shadow-xs cursor-grab p-4", {
+          "bg-white cursor-grab hover:bg-blue-100": !isDragging,
+          "z-10 cursor-grabbing bg-blue-300": isDragging,
+          "ring-2 ring-blue-500": isOver,
+        })}
+        style={{
+          transform: `translate(${deltaPos.x}px, ${deltaPos.y}px)`,
+        }}
+      >
+        <div className="flex items-baseline gap-1">
+          <div
+            className="w-[24px] h-[24px] shrink-0 rounded-full flex items-center justify-center text-white font-bold text-xs mr-2"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            {title.charAt(0)}
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <h3 className="text-sm font-medium">{title}</h3>
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### Column.tsx
+
+```tsx
+import { ReactNode } from "react";
+import { useDroppable } from "react-optimized-dnd";
+
+export default function Column({
+  children,
+  index,
+}: {
+  children?: ReactNode;
+  index: number;
+}) {
+  const { droppableRef, isOver } = useDroppable({
+    data: { index, type: "column" },
+  });
+
+  return (
+    <div
+      ref={droppableRef}
+      className="w-[280px] bg-gray-100 rounded-md gap-2 flex flex-col p-4"
+    >
+      {children}
+
+      {isOver && (
+        <div className="w-full relative rounded-md shadow-xs cursor-grab p-2 bg-blue-100 border border-blue-200 h-12" />
+      )}
+    </div>
+  );
+}
+```
