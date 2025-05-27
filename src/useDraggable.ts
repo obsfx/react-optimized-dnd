@@ -44,7 +44,7 @@ export function useDraggable(props?: UseDraggableProps) {
     } else {
       setDraggingElement(handle as RefObject<HTMLElement>, data);
     }
-  }, [isDragging]);
+  }, [isDragging, setDraggingElement, data]);
 
   const [deltaPos, setDeltaPos] = useState({ x: 0, y: 0 });
 
@@ -220,7 +220,7 @@ export function useDraggable(props?: UseDraggableProps) {
       document.removeEventListener("touchend", onTouchEnd);
       document.removeEventListener("touchmove", onTouchMove);
     };
-  }, [handle]);
+  }, [handle, dragThreshold, touchDragDelay, draggingElementRef]);
 
   const handleRef = (node: any) => {
     handle.current = node;

@@ -31,6 +31,8 @@ export function useDroppable(props?: UseDroppableProps) {
           },
           data: data || null,
         };
+      } else {
+        droppableElementRefsPool.current[uuid.current].data = data;
       }
     } else {
       if (droppableElementRefsPool.current[uuid.current]) {
@@ -38,8 +40,7 @@ export function useDroppable(props?: UseDroppableProps) {
         setIsOver(false);
       }
     }
-    // @eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isIntersecting]);
+  }, [isIntersecting, droppableElementRefsPool, data]);
 
   const droppableRef = (node: any) => {
     elementRef.current = node;

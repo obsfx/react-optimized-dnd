@@ -19,6 +19,7 @@
     "repomix": "npx repomix --include \"src\""
   },
   "dependencies": {
+    "build": "^0.1.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "usehooks-ts": "^3.1.1",
