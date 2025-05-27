@@ -198,7 +198,7 @@ export function useDraggable(props?: UseDraggableProps) {
 
     handle.current?.addEventListener("mouseenter", onMouseEnter);
     handle.current?.addEventListener("mouseleave", onMouseLeave);
-    document.addEventListener("mousedown", onMouseDown);
+    handle.current?.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("scroll", onScroll);
@@ -211,7 +211,7 @@ export function useDraggable(props?: UseDraggableProps) {
     return () => {
       handle.current?.removeEventListener("mouseenter", onMouseEnter);
       handle.current?.removeEventListener("mouseleave", onMouseLeave);
-      document.removeEventListener("mousedown", onMouseDown);
+      handle.current?.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("scroll", onScroll);
