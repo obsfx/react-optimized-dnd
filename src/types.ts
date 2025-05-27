@@ -28,6 +28,7 @@ export interface IReactOptimizedDndComponentState {
 export interface UseDraggableProps {
   data?: any;
   dragThreshold?: number;
+  touchDragDelay?: number;
 }
 
 export interface UseDroppableProps {

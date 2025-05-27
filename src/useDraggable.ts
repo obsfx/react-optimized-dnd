@@ -4,9 +4,10 @@ import { useReactOptimizedDndContext } from "./ReactOptimizedDndContext";
 import type { UseDraggableProps } from "./types";
 
 const DRAG_THRESHOLD = 3;
+const TOUCH_DRAG_DELAY = 150;
 
 export function useDraggable(props?: UseDraggableProps) {
-  const { data, dragThreshold = DRAG_THRESHOLD } = props || {};
+  const { data, dragThreshold = DRAG_THRESHOLD, touchDragDelay = TOUCH_DRAG_DELAY } = props || {};
 
   const { draggingElementRef, setDraggingElement } = useReactOptimizedDndContext();
 
@@ -46,6 +47,10 @@ export function useDraggable(props?: UseDraggableProps) {
   }, [isDragging]);
 
   const [deltaPos, setDeltaPos] = useState({ x: 0, y: 0 });
+
+  // Touch drag delay state
+  const touchDragTimeout = useRef<NodeJS.Timeout | null>(null);
+  const touchDragReady = useRef(false);
 
   useEffect(() => {
     if (!handle.current) return;
@@ -132,6 +137,12 @@ export function useDraggable(props?: UseDraggableProps) {
       handleState.current.holdStartedY = touch.clientY;
       handleState.current.holdStartedScrollX = window.scrollX;
       handleState.current.holdStartedScrollY = window.scrollY;
+      // Set up touch drag delay
+      touchDragReady.current = false;
+      if (touchDragTimeout.current) clearTimeout(touchDragTimeout.current);
+      touchDragTimeout.current = setTimeout(() => {
+        touchDragReady.current = true;
+      }, touchDragDelay);
     };
 
     const onTouchEnd = () => {
@@ -144,6 +155,9 @@ export function useDraggable(props?: UseDraggableProps) {
       handleState.current.holdStartedScrollY = 0;
       setIsDragging(false);
       setDeltaPos({ x: 0, y: 0 });
+      // Clear touch drag delay
+      if (touchDragTimeout.current) clearTimeout(touchDragTimeout.current);
+      touchDragReady.current = false;
     };
 
     const onTouchMove = (event: TouchEvent) => {
@@ -162,6 +176,15 @@ export function useDraggable(props?: UseDraggableProps) {
       const deltaX = deltaMouseX + deltaScrollX;
       const deltaY = deltaMouseY + deltaScrollY;
 
+      // If user moves before delay, cancel drag activation
+      if (!touchDragReady.current) {
+        if (Math.abs(deltaX) > dragThreshold || Math.abs(deltaY) > dragThreshold) {
+          if (touchDragTimeout.current) clearTimeout(touchDragTimeout.current);
+          touchDragReady.current = false;
+        }
+        return; // allow scroll
+      }
+
       if (handleState.current.dragging) {
         setDeltaPos({ x: deltaX, y: deltaY });
         event.preventDefault(); // prevent scrolling while dragging
@@ -173,11 +196,13 @@ export function useDraggable(props?: UseDraggableProps) {
         (Math.abs(deltaX) > dragThreshold ||
           Math.abs(deltaY) > dragThreshold) &&
         handleState.current.mouseOver &&
-        handleState.current.mouseDown
+        handleState.current.mouseDown &&
+        touchDragReady.current // Only trigger drag if delay passed
       ) {
         handleState.current.dragging = true;
         setIsDragging(true);
         event.preventDefault();
+        return;
       }
     };
 
