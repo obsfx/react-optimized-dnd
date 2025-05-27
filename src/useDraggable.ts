@@ -44,7 +44,7 @@ export function useDraggable(props?: UseDraggableProps) {
     } else {
       setDraggingElement(handle as RefObject<HTMLElement>, data);
     }
-  }, [isDragging, setDraggingElement, data]);
+  }, [isDragging]);
 
   const [deltaPos, setDeltaPos] = useState({ x: 0, y: 0 });
 
