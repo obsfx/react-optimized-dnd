@@ -142,6 +142,9 @@ export function useDraggable(props?: UseDraggableProps) {
       if (touchDragTimeout.current) clearTimeout(touchDragTimeout.current);
       touchDragTimeout.current = setTimeout(() => {
         touchDragReady.current = true;
+        // As soon as delay passes, enter dragging state
+        handleState.current.dragging = true;
+        setIsDragging(true);
       }, touchDragDelay);
     };
 
@@ -185,23 +188,10 @@ export function useDraggable(props?: UseDraggableProps) {
         return; // allow scroll
       }
 
-      if (handleState.current.dragging) {
+      // If touchDragReady, we are in dragging state
+      if (touchDragReady.current && handleState.current.dragging) {
         setDeltaPos({ x: deltaX, y: deltaY });
         event.preventDefault(); // prevent scrolling while dragging
-        return;
-      }
-
-      if (
-        !draggingElementRef.current &&
-        (Math.abs(deltaX) > dragThreshold ||
-          Math.abs(deltaY) > dragThreshold) &&
-        handleState.current.mouseOver &&
-        handleState.current.mouseDown &&
-        touchDragReady.current // Only trigger drag if delay passed
-      ) {
-        handleState.current.dragging = true;
-        setIsDragging(true);
-        event.preventDefault();
         return;
       }
     };
