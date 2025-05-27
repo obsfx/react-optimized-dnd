@@ -47,6 +47,9 @@ function ReactOptimizedDndProvider({
     let intersectingDroppableItem: IDroppableItem | null = null;
     let latestDeltaDistance = Infinity;
 
+    stateRef.current.overElement.ref = null;
+    stateRef.current.overElement.data = null;
+
     const keys = Object.keys(droppableElementRefsPool.current);
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];

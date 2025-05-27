@@ -1,6 +1,6 @@
 {
   "name": "react-optimized-dnd",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -44,5 +44,22 @@
     "@types/node": "^20.4.2"
   },
   "license": "MIT",
-  "author": "Omercan Balandi <hello@omercan.io>"
+  "author": "Omercan Balandi <hello@omercan.io>",
+  "keywords": [
+    "react",
+    "drag-and-drop",
+    "dnd",
+    "hooks",
+    "context",
+    "typescript",
+    "performant",
+    "draggable",
+    "droppable",
+    "react-dnd",
+    "trello",
+    "kanban",
+    "board",
+    "library",
+    "component"
+  ]
 }
