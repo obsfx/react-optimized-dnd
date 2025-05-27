@@ -4,7 +4,7 @@ import { useReactOptimizedDndContext } from "./ReactOptimizedDndContext";
 import type { UseDraggableProps } from "./types";
 
 const DRAG_THRESHOLD = 3;
-const TOUCH_DRAG_DELAY = 150;
+const TOUCH_DRAG_DELAY = 35;
 
 export function useDraggable(props?: UseDraggableProps) {
   const { data, dragThreshold = DRAG_THRESHOLD, touchDragDelay = TOUCH_DRAG_DELAY } = props || {};
